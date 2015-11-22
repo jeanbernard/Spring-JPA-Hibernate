@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
 	<mvc:annotation-driven>
 		<mvc:message-converters>
@@ -18,7 +18,7 @@
 	<mvc:resources location="assets" mapping="/assets/**"/>
 	<mvc:resources location="pdfs" mapping="/pdfs/**"/>
 	
-	<context:component-scan base-package="com.pluralsight"/>
+	<context:component-scan base-package="com.pluralsight.controller"/>
 	
 	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
 		<property name="order" value="1" />
@@ -65,5 +65,48 @@
 	 p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" p:order="2"/>
 	 	
 	 <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0"/>
+
+	<bean id="goalService" class="com.pluralsight.service.GoalServiceImpl">
+		
+	</bean>
+	<bean id="goalRepository" class="com.pluralsight.repository.GoalRepositoryImpl">
+
+	</bean>
+
+	<context:annotation-config/>
+	<context:component-scan base-package="com.pluralsight.service"/>
+	<context:component-scan base-package="com.pluralsight.repository"/>
+
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="punit"/>
+		<property name="dataSource" ref="dataSource"/>
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true"></property>
+			</bean>
+		</property>
+		<property name="jpaPropertyMap">
+			<map>
+				<entry key="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+				<entry key="hibernate.hbm2ddl.auto" value="update"/>
+				<entry key="hibernate.format.sql" value="true"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/FitnessTracker?autoReconnect=true" />
+		<property name="username" value="root"/>
+		<property name="password" value="CASCADA"/>
+	</bean>
 
 </beans>
