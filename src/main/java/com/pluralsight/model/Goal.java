@@ -2,10 +2,9 @@ package com.pluralsight.model;
 
 import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -13,11 +12,15 @@ import javax.persistence.Table;
 public class Goal {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Range(min = 1, max = 120)
+	@Column(name="MINUTES")
 	private int minutes;
+
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL)
+	private List<Exercise> exercises = new ArrayList<Exercise>();
 
 	public int getMinutes() {
 		return minutes;
@@ -34,5 +37,12 @@ public class Goal {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
+	public List<Exercise> getExercises() {
+		return exercises;
+	}
+
+	public void setExercises(List<Exercise> exercises) {
+		this.exercises = exercises;
+	}
 }
