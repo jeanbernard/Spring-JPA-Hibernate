@@ -9,17 +9,26 @@ import java.util.List;
 
 @Entity
 @Table(name = "Goal")
+@NamedQueries({
+        @NamedQuery(name=Goal.FIND_GOAL_REPORTS, query="Select new com.pluralsight.model.GoalReport(g.minutes, e.minutes, e.activity)" +
+                    "from Goal g, Exercise e where g.id = e.goal.id"),
+        @NamedQuery(name=Goal.FIND_ALL_GOALS, query="Select distinct g from Goal g join fetch g.exercises e")
+})
 public class Goal {
 
-	@Id
+    public static final String FIND_GOAL_REPORTS = "findGoalReports";
+    public static final String FIND_ALL_GOALS = "findAllGoals";
+
+    @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="GOAL_ID")
 	private Long id;
 
 	@Range(min = 1, max = 120)
 	@Column(name="MINUTES")
 	private int minutes;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Exercise> exercises = new ArrayList<Exercise>();
 
 	public int getMinutes() {
